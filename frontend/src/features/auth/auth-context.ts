@@ -1,6 +1,15 @@
 import { createContext, useContext } from 'react'
 
-export type UserRole = 'EMPLOYEE' | 'MANAGER'
+export type UserRole = 'EMPLOYEE' | 'MANAGER' | 'ADMIN'
+
+export const ROLE_LABEL: Record<UserRole, string> = {
+  EMPLOYEE: 'Colaborador',
+  MANAGER: 'Gestor',
+  ADMIN: 'Administrador',
+}
+
+/** Papéis que podem aprovar ou recusar férias (espelha o backend). */
+export const APPROVER_ROLES: UserRole[] = ['MANAGER', 'ADMIN']
 
 export type User = {
   id: string

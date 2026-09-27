@@ -1,5 +1,6 @@
 import type { DataSourceOptions } from 'typeorm';
 import { InitialSchema1758990000000 } from '../../migrations/1758990000000-initial-schema.js';
+import { AddAdminRole1759000000000 } from '../../migrations/1759000000000-add-admin-role.js';
 import { User } from '../entities/user.entity.js';
 import { VacationRequest } from '../entities/vacation-request.entity.js';
 
@@ -14,7 +15,7 @@ export function buildDataSourceOptions(
     password: env.DB_PASSWORD ?? 'vacation',
     database: env.DB_NAME ?? 'vacation_tracker',
     entities: [User, VacationRequest],
-    migrations: [InitialSchema1758990000000],
+    migrations: [InitialSchema1758990000000, AddAdminRole1759000000000],
     synchronize: false,
   };
 }

@@ -1,4 +1,4 @@
-import { CalendarDays, CalendarPlus, ClipboardCheck, Loader2, LogOut, Palmtree } from 'lucide-react'
+import { CalendarDays, CalendarPlus, ClipboardCheck, Loader2, LogOut, Palmtree, UsersRound } from 'lucide-react'
 import { Suspense } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -12,23 +12,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useAuth } from '@/features/auth/auth-context'
+import { APPROVER_ROLES, ROLE_LABEL, useAuth } from '@/features/auth/auth-context'
 import { usePendingVacations } from '@/features/vacations/approvals/queries'
 import { initials } from '@/features/vacations/shared/dates'
 import { cn } from '@/lib/utils'
 
-const ROLE_LABEL = { EMPLOYEE: 'Colaborador', MANAGER: 'Gestor' } as const
-
 export function AppLayout() {
   const { user, logout } = useAuth()
-  const isManager = user?.role === 'MANAGER'
-  const pending = usePendingVacations(isManager)
+  const canApprove = !!user && APPROVER_ROLES.includes(user.role)
+  const pending = usePendingVacations(canApprove)
   const pendingCount = pending.data?.length ?? 0
 
   const links = [
     { to: '/ferias/mes', label: 'Quem está de férias', icon: CalendarDays },
     { to: '/ferias/solicitar', label: 'Solicitar férias', icon: CalendarPlus },
-    ...(isManager ? [{ to: '/ferias/aprovacoes', label: 'Aprovações', icon: ClipboardCheck }] : []),
+    ...(canApprove ? [{ to: '/ferias/aprovacoes', label: 'Aprovações', icon: ClipboardCheck }] : []),
+    ...(user?.role === 'ADMIN' ? [{ to: '/usuarios', label: 'Usuários', icon: UsersRound }] : []),
   ]
 
   return (

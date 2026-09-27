@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GetMeModule } from './features/auth/get-me/get-me.module.js';
 import { LoginModule } from './features/auth/login/login.module.js';
+import { CreateUserModule } from './features/users/create-user/create-user.module.js';
+import { ListUsersModule } from './features/users/list-users/list-users.module.js';
 import { ApproveVacationModule } from './features/vacations/approve-vacation/approve-vacation.module.js';
 import { ListMonthlyModule } from './features/vacations/list-monthly/list-monthly.module.js';
 import { ListMyVacationsModule } from './features/vacations/list-my-vacations/list-my-vacations.module.js';
@@ -32,6 +34,8 @@ import { buildDataSourceOptions } from './shared/database/database.config.js';
     ApproveVacationModule,
     RejectVacationModule,
     ListMonthlyModule,
+    CreateUserModule,
+    ListUsersModule,
   ],
 })
 export class AppModule {}

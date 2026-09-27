@@ -16,6 +16,16 @@ const SEED_USERS = [
     email: 'gestor@empresa.com',
     role: UserRole.MANAGER,
   },
+  {
+    name: 'Rafael Costa',
+    email: 'rafael@empresa.com',
+    role: UserRole.MANAGER,
+  },
+  {
+    name: 'Administrador',
+    email: 'admin@empresa.com',
+    role: UserRole.ADMIN,
+  },
   { name: 'Ana Souza', email: 'ana@empresa.com', role: UserRole.EMPLOYEE },
   { name: 'Bruno Lima', email: 'bruno@empresa.com', role: UserRole.EMPLOYEE },
   { name: 'Carla Mendes', email: 'carla@empresa.com', role: UserRole.EMPLOYEE },
@@ -69,6 +79,13 @@ async function seed() {
         userId: byEmail.get('bruno@empresa.com')!.id,
         startDate: dayOf(1, 10),
         endDate: dayOf(1, 24),
+        status: VacationStatus.PENDING,
+      }),
+      // Pedido de gestor: aprovado por outro gestor (Rafael) ou pelo admin
+      vacations.create({
+        userId: manager.id,
+        startDate: dayOf(2, 3),
+        endDate: dayOf(2, 14),
         status: VacationStatus.PENDING,
       }),
     ]);

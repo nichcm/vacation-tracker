@@ -36,8 +36,9 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./:/app
-      - /app/node_modules
+      # Só o código-fonte é montado: o dist/ fica dentro do container,
+      # então um build no host não interfere no watch (mudanças em package.json exigem --build)
+      - ./src:/app/src
     depends_on:
       postgres:
         condition: service_healthy

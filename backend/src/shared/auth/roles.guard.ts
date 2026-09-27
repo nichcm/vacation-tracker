@@ -24,7 +24,9 @@ export class RolesGuard implements CanActivate {
       .switchToHttp()
       .getRequest<{ user?: AuthenticatedUser }>().user;
     if (!user || !roles.includes(user.role)) {
-      throw new ForbiddenException('Acesso restrito a gestores');
+      throw new ForbiddenException(
+        'Você não tem permissão para acessar este recurso',
+      );
     }
     return true;
   }
