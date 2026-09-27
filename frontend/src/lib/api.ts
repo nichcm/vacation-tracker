@@ -1,4 +1,5 @@
 const TOKEN_KEY = 'vacation-tracker.token'
+const SERVER_UNAVAILABLE = 'Servidor indisponível no momento. Tente novamente em instantes.'
 
 export class ApiError extends Error {
   readonly status: number
@@ -45,11 +46,16 @@ export async function api<T>(path: string, { method = 'GET', body }: RequestOpti
   if (body !== undefined) headers['Content-Type'] = 'application/json'
   if (token) headers.Authorization = `Bearer ${token}`
 
-  const response = await fetch(`/api${path}`, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  })
+  let response: Response
+  try {
+    response = await fetch(`/api${path}`, {
+      method,
+      headers,
+      body: body === undefined ? undefined : JSON.stringify(body),
+    })
+  } catch {
+    throw new ApiError(0, SERVER_UNAVAILABLE)
+  }
 
   if (response.status === 401 && token) {
     setToken(null)
@@ -59,7 +65,8 @@ export async function api<T>(path: string, { method = 'GET', body }: RequestOpti
   const data = await response.json().catch(() => null)
   if (!response.ok) {
     const message = Array.isArray(data?.message) ? data.message.join('\n') : data?.message
-    throw new ApiError(response.status, message ?? 'Não foi possível completar a operação')
+    const fallback = response.status >= 500 ? SERVER_UNAVAILABLE : 'Não foi possível completar a operação'
+    throw new ApiError(response.status, message ?? fallback)
   }
   return data as T
 }
