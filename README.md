@@ -4,7 +4,8 @@ MVP de acompanhamento de férias:
 
 - **Login** (JWT)
 - **Solicitar férias** — escolha de data de início e fim num calendário + histórico das próprias solicitações
-- **Aprovações** (gestor) — aprovar ou recusar (com motivo opcional) os pedidos pendentes
+- **Aprovações** (gestor/admin) — aprovar ou recusar (com motivo opcional) os pedidos pendentes
+- **Usuários** (admin) — listar e cadastrar colaboradores, gestores e administradores
 - **Quem está de férias** — férias aprovadas do mês, com linha do tempo e navegação entre meses
 
 | Camada   | Stack |
@@ -69,13 +70,26 @@ Todos com a senha `ferias123` (definida em [backend/src/seed/seed.ts](backend/sr
 
 | E-mail | Papel |
 |---|---|
-| gestor@empresa.com | Gestor |
+| gestor@empresa.com | Gestor (Gabriela) |
+| rafael@empresa.com | Gestor (Rafael) |
+| admin@empresa.com | Administrador |
 | ana@empresa.com | Colaborador |
 | bruno@empresa.com | Colaborador |
 | carla@empresa.com | Colaborador |
 
-O seed é idempotente e cria também algumas solicitações de exemplo no mês atual/próximo (apenas se a tabela estiver vazia).
+Há dois gestores para que o pedido de férias de um gestor possa ser aprovado pelo outro
+(o seed já cria um pedido pendente da Gabriela). O seed é idempotente e cria também algumas solicitações de exemplo no mês atual/próximo (apenas se a tabela estiver vazia).
 Para zerar o banco: `docker compose down -v`.
+
+## Papéis
+
+| Papel | Solicita férias | Aprova/recusa | Cadastra usuários |
+|---|:-:|:-:|:-:|
+| Colaborador (`EMPLOYEE`) | ✔ | | |
+| Gestor (`MANAGER`) | ✔ | ✔ | |
+| Administrador (`ADMIN`) | ✔ | ✔ | ✔ |
+
+Ninguém decide o próprio pedido: o de um gestor é aprovado por outro gestor ou pelo administrador.
 
 ## Backend — Vertical Slice Architecture
 
@@ -92,13 +106,16 @@ backend/src/
 ├─ features/
 │  ├─ auth/login/             POST  /api/auth/login
 │  ├─ auth/get-me/            GET   /api/auth/me
-│  └─ vacations/
-│     ├─ request-vacation/    POST  /api/vacations              { startDate, endDate }
-│     ├─ list-my-vacations/   GET   /api/vacations/mine
-│     ├─ list-pending/        GET   /api/vacations/pending           (gestor)
-│     ├─ approve-vacation/    PATCH /api/vacations/:id/approve       (gestor)
-│     ├─ reject-vacation/     PATCH /api/vacations/:id/reject {reason?} (gestor)
-│     └─ list-monthly/        GET   /api/vacations/monthly?month=AAAA-MM
+│  ├─ vacations/
+│  │  ├─ request-vacation/    POST  /api/vacations              { startDate, endDate }
+│  │  ├─ list-my-vacations/   GET   /api/vacations/mine
+│  │  ├─ list-pending/        GET   /api/vacations/pending              (gestor/admin)
+│  │  ├─ approve-vacation/    PATCH /api/vacations/:id/approve          (gestor/admin)
+│  │  ├─ reject-vacation/     PATCH /api/vacations/:id/reject {reason?} (gestor/admin)
+│  │  └─ list-monthly/        GET   /api/vacations/monthly?month=AAAA-MM
+│  └─ users/
+│     ├─ list-users/          GET   /api/users                          (admin)
+│     └─ create-user/         POST  /api/users { name, email, password, role } (admin)
 ├─ migrations/
 └─ seed/
 ```
@@ -109,7 +126,8 @@ Para adicionar uma funcionalidade, crie uma nova pasta em `features/<contexto>/<
 
 - A data de fim deve ser igual ou posterior à de início; a de início não pode estar no passado.
 - Não é permitido sobrepor uma solicitação pendente ou aprovada do mesmo colaborador (HTTP 409).
-- Somente solicitações pendentes podem ser aprovadas/recusadas; o gestor não decide as próprias.
+- Somente solicitações pendentes podem ser aprovadas/recusadas; ninguém decide as próprias.
+- Usuários: e-mail único (armazenado em minúsculas), senha de 8 a 72 caracteres, guardada com bcrypt.
 - "Quem está de férias" lista apenas férias **aprovadas** que tocam algum dia do mês.
 
 ### Scripts úteis (backend)
@@ -131,9 +149,10 @@ frontend/src/
 ├─ lib/api.ts                 # fetch com token JWT; chama /api (proxy do Vite/nginx)
 └─ features/
    ├─ auth/                   # login, contexto de autenticação, rotas protegidas
+   ├─ users/                  # /usuarios (admin): lista e cadastro
    └─ vacations/
       ├─ request/             # /ferias/solicitar
-      ├─ approvals/           # /ferias/aprovacoes (gestor)
+      ├─ approvals/           # /ferias/aprovacoes (gestor/admin)
       ├─ monthly/             # /ferias/mes
       └─ shared/              # tipos, badge de status, datas
 ```
