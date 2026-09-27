@@ -8,7 +8,12 @@ import {
 export enum UserRole {
   EMPLOYEE = 'EMPLOYEE',
   MANAGER = 'MANAGER',
+  /** Cadastra usuários e também aprova/recusa férias, como um gestor. */
+  ADMIN = 'ADMIN',
 }
+
+/** Papéis que podem aprovar ou recusar férias. */
+export const APPROVER_ROLES = [UserRole.MANAGER, UserRole.ADMIN];
 
 @Entity('users')
 export class User {

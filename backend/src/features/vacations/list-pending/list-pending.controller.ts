@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger';
 import type { AuthenticatedUser } from '../../../shared/auth/authenticated-user.js';
 import { CurrentUser, Roles } from '../../../shared/auth/decorators.js';
-import { UserRole } from '../../../shared/entities/user.entity.js';
+import { APPROVER_ROLES } from '../../../shared/entities/user.entity.js';
 import { VacationView } from '../shared/vacation-view.js';
 import { ListPendingHandler } from './list-pending.handler.js';
 
@@ -18,9 +18,9 @@ export class ListPendingController {
   constructor(private readonly handler: ListPendingHandler) {}
 
   @Get('pending')
-  @Roles(UserRole.MANAGER)
+  @Roles(...APPROVER_ROLES)
   @ApiOkResponse({ type: VacationView, isArray: true })
-  @ApiForbiddenResponse({ description: 'Somente gestores' })
+  @ApiForbiddenResponse({ description: 'Somente gestores e administradores' })
   pending(@CurrentUser() user: AuthenticatedUser): Promise<VacationView[]> {
     return this.handler.execute(user.id);
   }

@@ -65,6 +65,14 @@ describe('ApproveVacationHandler', () => {
     );
   });
 
+  it('permite que outro gestor aprove o pedido de um gestor', async () => {
+    repo.findOne.mockResolvedValue(pending({ userId: 'manager-2' }));
+
+    const result = await handler.execute(manager, 'v-1');
+
+    expect(result.status).toBe(VacationStatus.APPROVED);
+  });
+
   it('retorna 404 quando a solicitação não existe', async () => {
     repo.findOne.mockResolvedValue(null);
     await expect(handler.execute(manager, 'v-1')).rejects.toBeInstanceOf(

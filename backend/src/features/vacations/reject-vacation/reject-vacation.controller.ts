@@ -8,7 +8,7 @@ import {
 } from '@nestjs/swagger';
 import type { AuthenticatedUser } from '../../../shared/auth/authenticated-user.js';
 import { CurrentUser, Roles } from '../../../shared/auth/decorators.js';
-import { UserRole } from '../../../shared/entities/user.entity.js';
+import { APPROVER_ROLES } from '../../../shared/entities/user.entity.js';
 import { VacationView } from '../shared/vacation-view.js';
 import { RejectVacationRequest } from './reject-vacation.dto.js';
 import { RejectVacationHandler } from './reject-vacation.handler.js';
@@ -20,7 +20,7 @@ export class RejectVacationController {
   constructor(private readonly handler: RejectVacationHandler) {}
 
   @Patch(':id/reject')
-  @Roles(UserRole.MANAGER)
+  @Roles(...APPROVER_ROLES)
   @ApiOkResponse({ type: VacationView })
   @ApiNotFoundResponse()
   @ApiConflictResponse({ description: 'Solicitação já decidida' })
