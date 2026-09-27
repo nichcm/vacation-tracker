@@ -39,7 +39,8 @@ docker compose up --build
 - Swagger: http://localhost:3000/api/docs
 
 O container do backend compila, aplica as migrations, roda o seed e sobe em modo watch.
-O código de `backend/` e `frontend/` é montado via volume, então alterações recarregam automaticamente.
+O `backend/src` e o `frontend/` são montados via volume, então alterações de código recarregam automaticamente.
+Ao mudar dependências ou configurações do backend (`package.json`, `tsconfig.json`), rode `docker compose up --build`.
 
 ### Cada projeto separado
 
